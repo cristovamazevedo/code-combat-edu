@@ -131,6 +131,263 @@ document.addEventListener('DOMContentLoaded', () => {
         guideModal.classList.remove('active');
     });
 
+    // =========================================================================
+    // Adaptador Inteligente: Backend Flask (Local) OU GitHub Pages (Navegador)
+    // Funciona em qualquer navegador, computador, celular ou tablet via GitHub Pages!
+    // =========================================================================
+    const EduBackend = {
+        isStaticHosting: window.location.protocol === 'file:' || window.location.hostname.includes('github.io'),
+
+        getLocalDB() {
+            try {
+                return JSON.parse(localStorage.getItem('code_combat_edu_db') || '[]');
+            } catch(e) {
+                return [];
+            }
+        },
+
+        saveLocalDB(db) {
+            try {
+                localStorage.setItem('code_combat_edu_db', JSON.stringify(db));
+            } catch(e) {}
+        },
+
+        calcularConceito(nota) {
+            if (nota >= 3.6) return { nivel: 'Nível 4 - Avançado / Excelente', feedback: 'Parabéns! Você demonstrou domínio brilhante em todos os 5 pilares do Pensamento Computacional!' };
+            if (nota >= 2.6) return { nivel: 'Nível 3 - Proficiente / Bom', feedback: 'Muito bom trabalho! Você compreendeu a lógica estruturada e resolveu os desafios com sucesso.' };
+            if (nota >= 1.6) return { nivel: 'Nível 2 - Básico / Em Desenvolvimento', feedback: 'Bom começo! Você já entende a sequência de comandos. Continue praticando decomposição e repetição.' };
+            return { nivel: 'Nível 1 - Inicial / Em Construção', feedback: 'Você deu seus primeiros passos na programação! Revise as instruções passo a passo para evoluir.' };
+        },
+
+        async entrarAluno(nome, turma) {
+            if (!this.isStaticHosting) {
+                try {
+                    const resp = await fetch('/api/aluno/entrar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nome, turma })
+                    });
+                    if (resp.ok) return await resp.json();
+                } catch(e) {}
+            }
+
+            // Modo Standalone Web (GitHub Pages)
+            const db = this.getLocalDB();
+            let aluno = db.find(a => a.nome.toLowerCase() === nome.toLowerCase() && a.turma.toLowerCase() === turma.toLowerCase());
+            if (!aluno) {
+                aluno = {
+                    id: Date.now(),
+                    avaliacao_id: Date.now(),
+                    nome,
+                    turma,
+                    fase_atual: 1,
+                    nota_atual: 0.0,
+                    nota_final: 0.0,
+                    status: 'Em Andamento',
+                    nota_instrucoes: 0.0,
+                    nota_algoritmo: 0.0,
+                    nota_decomposicao: 0.0,
+                    nota_padroes: 0.0,
+                    nota_abstracao: 0.0,
+                    ja_concluiu: false,
+                    data_inicio: new Date().toISOString(),
+                    data_fmt: new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})
+                };
+                db.push(aluno);
+                this.saveLocalDB(db);
+            }
+            return { sucesso: true, aluno };
+        },
+
+        async salvarProgresso(payload) {
+            if (!this.isStaticHosting) {
+                try {
+                    const resp = await fetch('/api/avaliacao/progresso', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (resp.ok) return await resp.json();
+                } catch(e) {}
+            }
+
+            // Modo Standalone Web (GitHub Pages)
+            const db = this.getLocalDB();
+            const idx = db.findIndex(a => a.id === payload.aluno_id || a.avaliacao_id === payload.avaliacao_id);
+            if (idx !== -1) {
+                db[idx].fase_atual = payload.fase_atual;
+                db[idx].nota_final = payload.nota_final;
+                db[idx].status = payload.status || 'Em Andamento';
+                if (payload.pilares) {
+                    db[idx].nota_instrucoes = payload.pilares.instrucoes || 0.0;
+                    db[idx].nota_algoritmo = payload.pilares.algoritmo || 0.0;
+                    db[idx].nota_decomposicao = payload.pilares.decomposicao || 0.0;
+                    db[idx].nota_padroes = payload.pilares.padroes || 0.0;
+                    db[idx].nota_abstracao = payload.pilares.abstracao || 0.0;
+                }
+                db[idx].data_fmt = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                this.saveLocalDB(db);
+            }
+            return { sucesso: true };
+        },
+
+        async finalizarAvaliacao(payload) {
+            if (!this.isStaticHosting) {
+                try {
+                    const resp = await fetch('/api/avaliacao/finalizar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (resp.ok) return await resp.json();
+                } catch(e) {}
+            }
+
+            // Modo Standalone Web (GitHub Pages)
+            const db = this.getLocalDB();
+            const idx = db.findIndex(a => a.id === payload.aluno_id || a.avaliacao_id === payload.avaliacao_id);
+            const nota = Math.min(4.0, Math.max(0.0, Number(payload.nota_final || 0)));
+            const info = this.calcularConceito(nota);
+            const status = payload.motivo === 'conclusao' ? 'Concluído' : 'Finalizado / Desistiu';
+
+            if (idx !== -1) {
+                db[idx].nota_final = nota;
+                db[idx].fase_atual = payload.fase_atual;
+                db[idx].status = status;
+                db[idx].nivel_conceitual = info.nivel;
+                db[idx].feedback = info.feedback;
+                db[idx].ja_concluiu = true;
+                if (payload.pilares) {
+                    db[idx].nota_instrucoes = payload.pilares.instrucoes || 0.0;
+                    db[idx].nota_algoritmo = payload.pilares.algoritmo || 0.0;
+                    db[idx].nota_decomposicao = payload.pilares.decomposicao || 0.0;
+                    db[idx].nota_padroes = payload.pilares.padroes || 0.0;
+                    db[idx].nota_abstracao = payload.pilares.abstracao || 0.0;
+                }
+                db[idx].data_fmt = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                this.saveLocalDB(db);
+            }
+
+            return {
+                sucesso: true,
+                nota_final: nota,
+                fase_atual: payload.fase_atual,
+                status: status,
+                nivel_conceitual: info.nivel,
+                feedback: info.feedback,
+                pilares: payload.pilares || {}
+            };
+        },
+
+        async loginProfessor(senha) {
+            if (!this.isStaticHosting) {
+                try {
+                    const resp = await fetch('/api/professor/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ senha })
+                    });
+                    if (resp.ok) return await resp.json();
+                } catch(e) {}
+            }
+
+            // Modo Standalone Web (GitHub Pages)
+            if (senha === 'Luana@2011' || senha === 'Luana@ 2011') {
+                return { sucesso: true, token: 'prof_token_' + Date.now() };
+            }
+            return { sucesso: false, erro: 'Senha incorreta!' };
+        },
+
+        async obterTurmas(token) {
+            if (!this.isStaticHosting) {
+                try {
+                    const resp = await fetch('/api/professor/turmas', {
+                        headers: { 'X-Teacher-Token': token }
+                    });
+                    if (resp.ok) return await resp.json();
+                } catch(e) {}
+            }
+
+            const db = this.getLocalDB();
+            const turmas = [...new Set(db.map(a => a.turma).filter(Boolean))].sort();
+            return { turmas };
+        },
+
+        async obterAvaliacoes(token, turma) {
+            if (!this.isStaticHosting) {
+                try {
+                    const resp = await fetch(`/api/professor/avaliacoes?turma=${encodeURIComponent(turma || '')}`, {
+                        headers: { 'X-Teacher-Token': token }
+                    });
+                    if (resp.ok) return await resp.json();
+                } catch(e) {}
+            }
+
+            let db = this.getLocalDB();
+            if (turma) {
+                db = db.filter(a => a.turma.toLowerCase() === turma.toLowerCase());
+            }
+
+            const total = db.length;
+            const soma = db.reduce((acc, a) => acc + (Number(a.nota_final) || 0), 0);
+            const media = total > 0 ? (soma / total) : 0;
+            const n4 = db.filter(a => (Number(a.nota_final) || 0) >= 3.6).length;
+            const n3 = db.filter(a => (Number(a.nota_final) || 0) >= 2.6 && (Number(a.nota_final) || 0) < 3.6).length;
+
+            return {
+                avaliacoes: db,
+                estatisticas: {
+                    total_alunos: total,
+                    media_geral: media,
+                    distribuicao: { nivel_4: n4, nivel_3: n3 }
+                }
+            };
+        },
+
+        async excluirAvaliacao(token, id) {
+            if (!this.isStaticHosting) {
+                try {
+                    const resp = await fetch(`/api/professor/avaliacao/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'X-Teacher-Token': token }
+                    });
+                    if (resp.ok) return await resp.json();
+                } catch(e) {}
+            }
+
+            let db = this.getLocalDB();
+            db = db.filter(a => String(a.id) !== String(id) && String(a.avaliacao_id) !== String(id));
+            this.saveLocalDB(db);
+            return { sucesso: true };
+        },
+
+        exportarCsv(token, turma) {
+            if (!this.isStaticHosting) {
+                window.open(`/api/professor/exportar-csv?token=${token}&turma=${encodeURIComponent(turma || '')}`, '_blank');
+                return;
+            }
+
+            let db = this.getLocalDB();
+            if (turma) {
+                db = db.filter(a => a.turma.toLowerCase() === turma.toLowerCase());
+            }
+
+            let csv = '\uFEFFNome,Turma,Status,Fase Atual,Nota Final,Nivel,Instrucoes,Algoritmo,Decomposicao,Padroes,Abstracao,Data\n';
+            db.forEach(a => {
+                csv += `"${a.nome}","${a.turma}","${a.status || 'Em Andamento'}","Fase ${a.fase_atual || 1}",${Number(a.nota_final || 0).toFixed(2)},"${a.nivel_conceitual || '-'}","${Number(a.nota_instrucoes || 0).toFixed(1)}","${Number(a.nota_algoritmo || 0).toFixed(1)}","${Number(a.nota_decomposicao || 0).toFixed(1)}","${Number(a.nota_padroes || 0).toFixed(1)}","${Number(a.nota_abstracao || 0).toFixed(1)}","${a.data_fmt || '-'}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `avaliacoes_computacao_${turma || 'geral'}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
     // 1. Verificação de Aluno Logado
     const savedStudent = sessionStorage.getItem('aluno_sessao');
     if (savedStudent) {
@@ -156,28 +413,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!nome || !turma) return;
 
         try {
-            const resp = await fetch('/api/aluno/entrar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, turma })
-            });
-            const data = await resp.json();
+            const data = await EduBackend.entrarAluno(nome, turma);
 
-            if (resp.ok && data.sucesso) {
+            if (data.sucesso) {
                 currentStudent = data.aluno;
                 sessionStorage.setItem('aluno_sessao', JSON.stringify(currentStudent));
                 studentModal.classList.remove('active');
                 atualizarInfoAluno();
 
                 if (currentStudent.ja_concluiu) {
-                    alert(`Olá, ${currentStudent.nome}! Você já possui um registro de avaliação com Nota ${Number(currentStudent.nota_atual).toFixed(2)}. Se desejar recomeçar do zero, peça para a professora Luana liberar uma nova tentativa no painel docente.`);
+                    alert(`Olá, ${currentStudent.nome}! Você já possui um registro de avaliação com Nota ${Number(currentStudent.nota_atual || currentStudent.nota_final).toFixed(2)}. Se desejar recomeçar do zero, peça para a professora Luana liberar uma nova tentativa no painel docente.`);
                 }
             } else {
                 alert(data.erro || 'Erro ao realizar login.');
             }
         } catch(err) {
             console.error(err);
-            alert('Erro de conexão com o servidor da atividade.');
+            alert('Erro de conexão ao registrar aluno.');
         }
     });
 
@@ -200,29 +452,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Salvar Progresso no Banco de Dados em Tempo Real a cada conquista
+    // Salvar Progresso em Tempo Real a cada conquista
     async function salvarProgressoRealTime() {
         if (!currentStudent || !currentStudent.avaliacao_id) return;
         const totalScore = evaluator.getCurrentTotalScore();
         const evalData = evaluator.computeFinalEvaluation();
 
         try {
-            await fetch('/api/avaliacao/progresso', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    avaliacao_id: currentStudent.avaliacao_id,
-                    aluno_id: currentStudent.id,
-                    fase_atual: currentLevelIndex + 1,
-                    nota_final: totalScore,
-                    pilares: evalData.pilares,
-                    tempo_segundos: Math.round((Date.now() - evaluator.startTime) / 1000),
-                    detalhes: evaluator.levelStats,
-                    status: 'Em Andamento'
-                })
+            await EduBackend.salvarProgresso({
+                avaliacao_id: currentStudent.avaliacao_id,
+                aluno_id: currentStudent.id,
+                fase_atual: currentLevelIndex + 1,
+                nota_final: totalScore,
+                pilares: evalData.pilares,
+                tempo_segundos: Math.round((Date.now() - evaluator.startTime) / 1000),
+                detalhes: evaluator.levelStats,
+                status: 'Em Andamento'
             });
         } catch(e) {
-            console.warn('Erro ao sincronizar progresso com o banco:', e);
+            console.warn('Erro ao sincronizar progresso:', e);
         }
     }
 
@@ -397,23 +645,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const avaliacao = evaluator.computeFinalEvaluation();
 
         try {
-            const resp = await fetch('/api/avaliacao/finalizar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    avaliacao_id: currentStudent ? currentStudent.avaliacao_id : null,
-                    aluno_id: currentStudent ? currentStudent.id : null,
-                    fase_atual: currentLevelIndex + 1,
-                    nota_final: avaliacao.notaFinal,
-                    pilares: avaliacao.pilares,
-                    tempo_segundos: avaliacao.tempoSegundos,
-                    detalhes: avaliacao.detalhesNiveis,
-                    motivo: motivo
-                })
+            const data = await EduBackend.finalizarAvaliacao({
+                avaliacao_id: currentStudent ? currentStudent.avaliacao_id : null,
+                aluno_id: currentStudent ? currentStudent.id : null,
+                fase_atual: currentLevelIndex + 1,
+                nota_final: avaliacao.notaFinal,
+                pilares: avaliacao.pilares,
+                tempo_segundos: avaliacao.tempoSegundos,
+                detalhes: avaliacao.detalhesNiveis,
+                motivo: motivo
             });
-            const data = await resp.json();
 
-            if (resp.ok && data.sucesso) {
+            if (data.sucesso) {
                 if (motivo === 'conclusao') {
                     certMainTitle.textContent = '🎉 Avaliação Concluída!';
                 } else {
@@ -435,7 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 certModal.classList.add('active');
             } else {
-                alert('Erro ao registrar avaliação final no banco de dados.');
+                alert('Erro ao registrar avaliação final.');
             }
         } catch(e) {
             console.error(e);
@@ -467,26 +710,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const senha = inputTeacherPass.value.trim();
 
         try {
-            const resp = await fetch('/api/professor/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ senha })
-            });
-            const data = await resp.json();
+            const data = await EduBackend.loginProfessor(senha);
 
-            if (resp.ok && data.sucesso) {
+            if (data.sucesso) {
                 teacherToken = data.token;
                 sessionStorage.setItem('teacher_token', teacherToken);
                 teacherModal.classList.remove('active');
                 abrirDashboardProfessor();
             } else {
                 teacherError.style.display = 'block';
-                teacherError.textContent = 'Senha incorreta!';
+                teacherError.textContent = data.erro || 'Senha incorreta!';
             }
         } catch(err) {
             console.error(err);
             teacherError.style.display = 'block';
-            teacherError.textContent = 'Erro ao conectar ao servidor.';
+            teacherError.textContent = 'Erro ao conectar ao painel.';
         }
     });
 
@@ -502,11 +740,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function carregarFiltroTurmas() {
         try {
-            const resp = await fetch('/api/professor/turmas', {
-                headers: { 'X-Teacher-Token': teacherToken }
-            });
-            const data = await resp.json();
-            if (resp.ok && data.turmas) {
+            const data = await EduBackend.obterTurmas(teacherToken);
+            if (data && data.turmas) {
                 const currentVal = filterTurma.value;
                 filterTurma.innerHTML = '<option value="">Todas as Turmas</option>';
                 data.turmas.forEach(t => {
@@ -525,20 +760,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnExportCsv.addEventListener('click', () => {
-        const turma = encodeURIComponent(filterTurma.value);
-        window.open(`/api/professor/exportar-csv?token=${teacherToken}&turma=${turma}`, '_blank');
+        EduBackend.exportarCsv(teacherToken, filterTurma.value);
     });
 
     async function carregarRelatorioProfessor() {
-        const turma = encodeURIComponent(filterTurma.value);
         try {
-            const resp = await fetch(`/api/professor/avaliacoes?turma=${turma}`, {
-                headers: { 'X-Teacher-Token': teacherToken }
-            });
-            const data = await resp.json();
+            const data = await EduBackend.obterAvaliacoes(teacherToken, filterTurma.value);
 
-            if (resp.ok) {
-                renderizarTabelaProfessor(data.avaliacoes);
+            if (data) {
+                renderizarTabelaProfessor(data.avaliacoes || []);
                 statTotalAlunos.textContent = data.estatisticas.total_alunos;
                 statMediaGeral.textContent = data.estatisticas.media_geral.toFixed(2);
                 statNivel4.textContent = data.estatisticas.distribuicao.nivel_4;
@@ -592,10 +822,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             tr.querySelector('.btn-del').addEventListener('click', async () => {
                 if (confirm(`Deseja apagar o registro de ${r.nome} (${r.turma}) para permitir que o aluno refaça a avaliação do zero?`)) {
-                    await fetch(`/api/professor/avaliacao/${r.id}`, {
-                        method: 'DELETE',
-                        headers: { 'X-Teacher-Token': teacherToken }
-                    });
+                    await EduBackend.excluirAvaliacao(teacherToken, r.id);
                     carregarRelatorioProfessor();
                 }
             });

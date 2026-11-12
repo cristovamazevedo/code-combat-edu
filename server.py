@@ -494,6 +494,10 @@ def professor_exportar_csv():
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
+def create_app():
+    init_db()
+    return app
+
 if __name__ == '__main__':
     import sys
     if sys.platform == 'win32':
@@ -501,10 +505,11 @@ if __name__ == '__main__':
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
         sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
     init_db()
+    port = int(os.environ.get('PORT', 5000))
     print("=" * 60)
     print(" [OK] CODE COMBAT EDU - ATIVIDADE AVALIATIVA DE COMPUTACAO")
-    print(" Banco de Dados: SQLite ativado em data/avaliacao.db")
-    print(" Servidor rodando em: http://127.0.0.1:5000")
+    print(f" Banco de Dados: SQLite ativado em data/avaliacao.db")
+    print(f" Servidor rodando na porta: {port}")
     print(" Acesso do Professor: protegido por senha")
     print("=" * 60)
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False)

@@ -1,4 +1,4 @@
-# 🏰 Code Combat Edu — Atividade Avaliativa de Pensamento Computacional
+# 🏰 EduDigital — Atividade Avaliativa de Pensamento Computacional
 
 Plataforma educacional gamificada (estilo CodeCombat) para avaliação de **Pensamento Computacional** em sala de aula.
 

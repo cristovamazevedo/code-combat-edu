@@ -507,7 +507,7 @@ if __name__ == '__main__':
     init_db()
     port = int(os.environ.get('PORT', 5000))
     print("=" * 60)
-    print(" [OK] CODE COMBAT EDU - ATIVIDADE AVALIATIVA DE COMPUTACAO")
+    print(" [OK] EDUDIGITAL - ATIVIDADE AVALIATIVA DE COMPUTACAO")
     print(f" Banco de Dados: SQLite ativado em data/avaliacao.db")
     print(f" Servidor rodando na porta: {port}")
     print(" Acesso do Professor: protegido por senha")

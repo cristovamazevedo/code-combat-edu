@@ -90,12 +90,16 @@ class DungeonEngine {
         const rows = this.currentLevel.grade.altura;
         
         const container = this.canvas.parentElement;
-        const maxWidth = Math.max(480, (container.clientWidth || 600) - 16);
-        const maxHeight = Math.max(340, (container.clientHeight || 420) - 16);
+        const containerW = container.clientWidth || (window.innerWidth - 32);
+        const containerH = container.clientHeight || 360;
+        
+        const maxWidth = Math.max(260, containerW - 12);
+        const maxHeight = Math.max(220, containerH - 12);
         
         const tsW = Math.floor(maxWidth / cols);
         const tsH = Math.floor(maxHeight / rows);
-        this.tileSize = Math.max(42, Math.min(74, Math.min(tsW, tsH)));
+        // Suporta desde celulares pequenos (320px) até monitores 4K
+        this.tileSize = Math.max(24, Math.min(74, Math.min(tsW, tsH)));
         
         this.canvas.width = cols * this.tileSize;
         this.canvas.height = rows * this.tileSize;

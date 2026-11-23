@@ -1052,86 +1052,40 @@ class DungeonEngine {
             if (gemasRestantes === 0) { lvl.objetivos[1].atingido = true; atingidos++; }
             if (noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
         } else if (lvl.id === 3) {
-            if (gemasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
+            if (this.bridgeActive) { lvl.objetivos[0].atingido = true; atingidos++; }
             if (noPortal) { lvl.objetivos[1].atingido = true; atingidos++; }
         } else if (lvl.id === 4) {
-            if (armadilhasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
-            if (gemasRestantes === 0) { lvl.objetivos[1].atingido = true; atingidos++; }
+            if (gemasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
+            if (!this.goblinAlive) { lvl.objetivos[1].atingido = true; atingidos++; }
             if (noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
         } else if (lvl.id === 5) {
             if (this.bridgeActive) { lvl.objetivos[0].atingido = true; atingidos++; }
-            if (noPortal) { lvl.objetivos[1].atingido = true; atingidos++; }
-        } else if (lvl.id === 6) {
-            if (gemasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
-            if (!this.goblinAlive) { lvl.objetivos[1].atingido = true; atingidos++; }
-            if (noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
-        } else if (lvl.id === 7) {
-            if (this.bridgeActive) { lvl.objetivos[0].atingido = true; atingidos++; }
-            if (gemasRestantes === 0) { lvl.objetivos[1].atingido = true; atingidos++; }
-            if (noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
-        } else if (lvl.id === 8) {
-            if (!this.goblinAlive) { lvl.objetivos[0].atingido = true; atingidos++; }
-            if (gemasRestantes === 0) { lvl.objetivos[1].atingido = true; atingidos++; }
-            if (this.altarActive && noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
-        } else if (lvl.id === 9) {
-            if (this.bridgeActive) { lvl.objetivos[0].atingido = true; atingidos++; }
             if (gemasRestantes === 0 && this.altarActive) { lvl.objetivos[1].atingido = true; atingidos++; }
             if (noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
-        } else if (lvl.id === 10) {
+        } else if (lvl.id === 6) {
             if (armadilhasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
             if (!this.goblinAlive) { lvl.objetivos[1].atingido = true; atingidos++; }
             if (gemasRestantes === 0 && this.altarActive && noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
-        } else if (lvl.id === 11) {
-            if (gemasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
-            if (this.altarActive && noPortal) { lvl.objetivos[1].atingido = true; atingidos++; }
-        } else if (lvl.id === 12) {
-            if (this.bridgeActive) { lvl.objetivos[0].atingido = true; atingidos++; }
-            if (!this.goblinAlive && armadilhasRestantes === 0) { lvl.objetivos[1].atingido = true; atingidos++; }
-            if (gemasRestantes === 0) { lvl.objetivos[2].atingido = true; atingidos++; }
-            if (this.altarActive && noPortal) { lvl.objetivos[3].atingido = true; atingidos++; }
-        } else if (lvl.id === 13) {
+        } else if (lvl.id === 7) {
             const usouLoop = /repetir\s*\(/i.test(code) || /for\s+/i.test(code) || /\.\w+\s*\(\s*\d+\s*\)/.test(code);
             if (gemasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
             if (usouLoop) { lvl.objetivos[1].atingido = true; atingidos++; }
             if (this.bridgeActive && noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
-        } else if (lvl.id === 14) {
-            const usouLoop = /repetir\s*\(/i.test(code) || /for\s+/i.test(code) || /\.\w+\s*\(\s*\d+\s*\)/.test(code);
-            if (gemasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
-            if (usouLoop) { lvl.objetivos[1].atingido = true; atingidos++; }
-            if (!this.goblinAlive && noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
-        } else if (lvl.id === 15) {
+        } else if (lvl.id === 8) {
             const usouLoop = /repetir\s*\(/i.test(code) || /for\s+/i.test(code) || /\.\w+\s*\(\s*\d+\s*\)/.test(code);
             if (gemasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
             if (usouLoop) { lvl.objetivos[1].atingido = true; atingidos++; }
             if (noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
-        } else if (lvl.id === 16) {
-            const usouLoop = /repetir\s*\(/i.test(code) || /for\s+/i.test(code) || /\.\w+\s*\(\s*\d+\s*\)/.test(code);
-            if (armadilhasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
-            if (gemasRestantes === 0) { lvl.objetivos[1].atingido = true; atingidos++; }
-            if (usouLoop) { lvl.objetivos[2].atingido = true; atingidos++; }
-            if (noPortal) { lvl.objetivos[3].atingido = true; atingidos++; }
-        } else if (lvl.id === 17) {
+        } else if (lvl.id === 9) {
             const usouFuncao = /(?:funcao|function|def)\s+[a-zA-Z0-9_]+/i.test(code);
             if (gemasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
             if (usouFuncao) { lvl.objetivos[1].atingido = true; atingidos++; }
             if (this.altarActive && noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
-        } else if (lvl.id === 18) {
+        } else if (lvl.id === 10) {
             const usouFuncao = /(?:funcao|function|def)\s+[a-zA-Z0-9_]+/i.test(code);
             if (gemasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
             if (usouFuncao) { lvl.objetivos[1].atingido = true; atingidos++; }
             if (this.altarActive && noPortal) { lvl.objetivos[2].atingido = true; atingidos++; }
-        } else if (lvl.id === 19) {
-            const usouFuncao = /(?:funcao|function|def)\s+[a-zA-Z0-9_]+/i.test(code);
-            if (!this.goblinAlive) { lvl.objetivos[0].atingido = true; atingidos++; }
-            if (gemasRestantes === 0) { lvl.objetivos[1].atingido = true; atingidos++; }
-            if (usouFuncao) { lvl.objetivos[2].atingido = true; atingidos++; }
-            if (this.altarActive && noPortal) { lvl.objetivos[3].atingido = true; atingidos++; }
-        } else if (lvl.id === 20) {
-            const usouFuncao = /(?:funcao|function|def)\s+[a-zA-Z0-9_]+/i.test(code);
-            if (gemasRestantes === 0) { lvl.objetivos[0].atingido = true; atingidos++; }
-            if (usouFuncao) { lvl.objetivos[1].atingido = true; atingidos++; }
-            if (!this.goblinAlive) { lvl.objetivos[2].atingido = true; atingidos++; }
-            if (this.altarActive && noPortal) { lvl.objetivos[3].atingido = true; atingidos++; }
         }
 
         const passou = atingidos >= lvl.objetivos.length;

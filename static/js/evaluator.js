@@ -1,13 +1,18 @@
-// Avaliador Pedagógico Cumulativo de 20 Fases (Total: 4.0 Pontos)
+// =========================================================================
+// Avaliador Pedagógico Cumulativo de 10 Fases - EDUDIGITAL (Total: 4.0 Pontos)
+// 10 fases x 0.40 pontos = 4.00 pontos no total.
+// 5 Pilares do Pensamento Computacional x 2 Fases (0.80 pts por pilar).
+// =========================================================================
+
 class Evaluator {
     constructor() {
         this.levelStats = {};
-        for (let i = 1; i <= 20; i++) {
+        for (let i = 1; i <= 10; i++) {
             this.levelStats[i] = {
                 attempts: 0,
                 completed: false,
                 code: '',
-                earnedScore: 0.0 // Cada fase vale até 0.20 pontos (20 x 0.20 = 4.0 pts)
+                earnedScore: 0.0 // Cada fase vale até 0.40 pontos (10 x 0.40 = 4.00 pts)
             };
         }
         this.startTime = Date.now();
@@ -25,58 +30,58 @@ class Evaluator {
         } else {
             // Pontuação parcial proporcional aos objetivos cumpridos
             const ratio = (result.atingidos || 0) / (result.total || 1);
-            stat.earnedScore = Math.max(stat.earnedScore, Math.round(ratio * 0.08 * 100) / 100);
+            stat.earnedScore = Math.max(stat.earnedScore, Math.round(ratio * 0.15 * 100) / 100);
         }
     }
 
     computeLevelScore(levelId, code, attempts) {
-        const MAX_PHASE = 0.20; // 0.20 pontos por fase (20 x 0.20 = 4.00)
+        const MAX_PHASE = 0.40; // 0.40 pontos por fase (10 x 0.40 = 4.00)
 
-        // Fases 1 a 4: Instruções e Sequenciamento
-        if (levelId >= 1 && levelId <= 4) {
+        // Fases 1 e 2: Instruções e Sequenciamento
+        if (levelId === 1 || levelId === 2) {
             if (attempts <= 2) return MAX_PHASE;
-            if (attempts <= 4) return 0.16;
-            return 0.12;
+            if (attempts <= 4) return 0.32;
+            return 0.25;
         }
-        // Fases 5 a 8: Algoritmo e Causalidade
-        else if (levelId >= 5 && levelId <= 8) {
+        // Fases 3 e 4: Algoritmo e Causalidade
+        else if (levelId === 3 || levelId === 4) {
             if (attempts <= 2) return MAX_PHASE;
-            if (attempts <= 4) return 0.16;
-            return 0.12;
+            if (attempts <= 4) return 0.32;
+            return 0.25;
         }
-        // Fases 9 a 12: Decomposição de Problemas
-        else if (levelId >= 9 && levelId <= 12) {
+        // Fases 5 e 6: Decomposição de Problemas
+        else if (levelId === 5 || levelId === 6) {
             if (attempts <= 2) return MAX_PHASE;
-            if (attempts <= 4) return 0.16;
-            return 0.12;
+            if (attempts <= 4) return 0.32;
+            return 0.25;
         }
-        // Fases 13 a 16: Reconhecimento de Padrões
-        else if (levelId >= 13 && levelId <= 16) {
+        // Fases 7 e 8: Reconhecimento de Padrões
+        else if (levelId === 7 || levelId === 8) {
             const usouLoop = /repetir\s*\(/i.test(code) || /for\s+/i.test(code) || /\.\w+\s*\(\s*\d+\s*\)/.test(code);
             if (usouLoop) {
-                return attempts <= 3 ? MAX_PHASE : 0.17;
+                return attempts <= 3 ? MAX_PHASE : 0.34;
             } else {
                 // Resolveu sem identificar/usar o laço do pilar
-                return 0.10;
+                return 0.20;
             }
         }
-        // Fases 17 a 20: Abstração e Funções
-        else if (levelId >= 17 && levelId <= 20) {
+        // Fases 9 e 10: Abstração e Funções
+        else if (levelId === 9 || levelId === 10) {
             const usouFuncao = /(?:funcao|function|def)\s+[a-zA-Z0-9_]+/i.test(code);
             if (usouFuncao) {
-                return attempts <= 3 ? MAX_PHASE : 0.17;
+                return attempts <= 3 ? MAX_PHASE : 0.34;
             } else {
                 // Resolveu sem abstrair em função
-                return 0.10;
+                return 0.20;
             }
         }
 
-        return 0.12;
+        return 0.25;
     }
 
     getCurrentTotalScore() {
         let total = 0;
-        for (let i = 1; i <= 20; i++) {
+        for (let i = 1; i <= 10; i++) {
             total += this.levelStats[i].earnedScore;
         }
         return Math.min(4.0, Math.round(total * 100) / 100);
@@ -85,7 +90,7 @@ class Evaluator {
     computeFinalEvaluation() {
         let notaTotal = this.getCurrentTotalScore();
 
-        // Cada pilar é composto por 4 fases (4 x 0.20 = 0.80 pontos).
+        // Cada pilar é composto por 2 fases (2 x 0.40 = 0.80 pontos).
         // Convertido para a escala padrão 0.0 a 4.0 por pilar no Boletim:
         const calcPilarScale = (startLvl, endLvl) => {
             let sum = 0;
@@ -95,11 +100,11 @@ class Evaluator {
             return Math.min(4.0, Math.round((sum / 0.80) * 4.0 * 10) / 10);
         };
 
-        const pInstrucoes = calcPilarScale(1, 4);
-        const pAlgoritmo = calcPilarScale(5, 8);
-        const pDecomposicao = calcPilarScale(9, 12);
-        const pPadroes = calcPilarScale(13, 16);
-        const pAbstracao = calcPilarScale(17, 20);
+        const pInstrucoes = calcPilarScale(1, 2);
+        const pAlgoritmo = calcPilarScale(3, 4);
+        const pDecomposicao = calcPilarScale(5, 6);
+        const pPadroes = calcPilarScale(7, 8);
+        const pAbstracao = calcPilarScale(9, 10);
 
         let notaDiscreta = 0;
         let conceito = '';
@@ -110,7 +115,7 @@ class Evaluator {
             notaDiscreta = 4;
             conceito = 'Nível 4 - Avançado / Excelente';
             badgeColor = '#2ed573';
-            feedbackGeral = 'Excelente desempenho! Você concluiu os desafios com autonomia e precisão matemática. Dominou os 20 níveis aplicando algoritmos precisos, decomposição organizada, laços nos padrões e funções na abstração!';
+            feedbackGeral = 'Excelente desempenho! Você concluiu os 10 desafios com autonomia e precisão matemática. Dominou os 5 pilares do Pensamento Computacional aplicando algoritmos ordenados, decomposição estruturada, laços de repetição e funções de abstração!';
         } else if (notaTotal >= 2.6) {
             notaDiscreta = 3;
             conceito = 'Nível 3 - Proficiente';
@@ -130,7 +135,7 @@ class Evaluator {
             notaDiscreta = 0;
             conceito = 'Nível 0 - Em Andamento / Inicial';
             badgeColor = '#747d8c';
-            feedbackGeral = 'Pontuação inicial ou avaliação finalizada nas etapas iniciais. Continue praticando para avançar pelos 20 níveis!';
+            feedbackGeral = 'Pontuação inicial ou avaliação finalizada nas etapas iniciais. Continue praticando para avançar pelos 10 desafios!';
         }
 
         const elapsedSeconds = Math.round((Date.now() - this.startTime) / 1000);

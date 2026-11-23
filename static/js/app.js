@@ -1,4 +1,4 @@
-// Controlador Principal da Aplicação (Layout Ergonômico Lado a Lado • 20 Fases)
+// Controlador Principal da Aplicação (Layout Ergonômico Lado a Lado • 10 Fases)
 document.addEventListener('DOMContentLoaded', () => {
     // Instâncias
     const engine = new DungeonEngine('gameCanvas');
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 2. Renderização de Níveis e Tracker (20 Fases)
+    // 2. Renderização de Níveis e Tracker (10 Fases)
     function renderizarTracker() {
         levelTracker.innerHTML = '';
         GAME_LEVELS.forEach((lvl, idx) => {
@@ -532,7 +532,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Código Inicial Seguro
         codeEditor.value = lvl.codigoInicial;
-        consoleOutput.innerHTML = `> Fase ${lvl.id} de 20 pronta: ${lvl.titulo}<br>> Esta fase vale +${lvl.pontosFase.toFixed(2)} pts. Complete o código e clique em Executar!`;
+        consoleOutput.innerHTML = `> Fase ${lvl.id} de 10 pronta: ${lvl.titulo}<br>> Esta fase vale +${lvl.pontosFase.toFixed(2)} pts. Complete o código e clique em Executar!`;
         arenaMsg.textContent = 'Cavaleiro aguardando comandos.';
 
         renderizarTracker();
@@ -602,7 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }, 1200);
                     } else {
                         setTimeout(() => {
-                            if (confirm(`Parabéns! Você concluiu a Fase ${lvl.id} de 20!\nPontuação atual: ${evaluator.getCurrentTotalScore().toFixed(2)} / 4.00\n\nDeseja avançar para a Fase ${lvl.id + 1}?`)) {
+                            if (confirm(`Parabéns! Você concluiu a Fase ${lvl.id} de 10!\nPontuação atual: ${evaluator.getCurrentTotalScore().toFixed(2)} / 4.00\n\nDeseja avançar para a Fase ${lvl.id + 1}?`)) {
                                 carregarNivel(currentLevelIndex + 1);
                             }
                         }, 500);
@@ -622,7 +622,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Modal de Desistir / Entregar com Nota Atual
     btnFinishEval.addEventListener('click', () => {
-        surrenderPhaseText.textContent = `Fase ${currentLevelIndex + 1} de 20`;
+        surrenderPhaseText.textContent = `Fase ${currentLevelIndex + 1} de 10`;
         surrenderScoreText.textContent = `${evaluator.getCurrentTotalScore().toFixed(2)} / 4.00`;
         confirmSurrenderModal.classList.add('active');
     });
@@ -807,7 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><strong>${r.nome}</strong></td>
                 <td><span class="turma-badge">${r.turma}</span></td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                <td>Fase ${r.fase_atual || 1} de 20</td>
+                <td>Fase ${r.fase_atual || 1} de 10</td>
                 <td><span class="grade-pill ${gradeClass}">Nota ${Number(r.nota_final).toFixed(2)}</span></td>
                 <td>${Number(r.nota_instrucoes).toFixed(1)}</td>
                 <td>${Number(r.nota_algoritmo).toFixed(1)}</td>

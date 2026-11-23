@@ -4,21 +4,21 @@ Plataforma educacional gamificada (estilo CodeCombat) para avaliação de **Pens
 
 ## 🎮 Sobre o Projeto
 
-Os alunos controlam um herói em uma masmorra resolvendo **20 desafios de programação** que ensinam os 5 pilares do Pensamento Computacional:
+Os alunos controlam um herói em uma masmorra resolvendo **10 desafios de programação** que ensinam os 5 pilares do Pensamento Computacional:
 
 | Pilar | Fases | Conceito |
 |---|---|---|
-| 📋 Instruções | 1 – 4 | Sequência de comandos |
-| ⚙️ Algoritmo | 5 – 8 | Ordem lógica e causa/efeito |
-| 🧩 Decomposição | 9 – 12 | Dividir problemas em partes |
-| 🔄 Reconhecimento de Padrões | 13 – 16 | Loops `repetir(N)` |
-| 🔮 Abstração | 17 – 20 | Funções reutilizáveis |
+| 📋 Instruções | 1 e 2 | Sequência de comandos |
+| ⚙️ Algoritmo | 3 e 4 | Ordem lógica e causa/efeito |
+| 🧩 Decomposição | 5 e 6 | Dividir problemas em partes |
+| 🔄 Reconhecimento de Padrões | 7 e 8 | Loops `repetir(N)` |
+| 🔮 Abstração | 9 e 10 | Funções reutilizáveis |
 
 ## 📊 Sistema de Avaliação
 
 - **Nota:** 0,00 a 4,00 pontos  
-- **Cada fase:** +0,20 pontos  
-- **20 fases × 0,20 = 4,00 pontos**
+- **Cada fase:** +0,40 pontos  
+- **10 fases × 0,40 = 4,00 pontos**
 - O aluno pode **desistir a qualquer momento** e receber a nota acumulada
 - Boletim de desempenho gerado automaticamente
 

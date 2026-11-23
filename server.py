@@ -454,7 +454,7 @@ def professor_exportar_csv():
     output = io.StringIO()
     writer = csv.writer(output, delimiter=';')
     writer.writerow([
-        'Nome do Aluno', 'Turma', 'Status', 'Fase Atual (de 20)', 'Nota Final (0 a 4)', 'Conceito',
+        'Nome do Aluno', 'Turma', 'Status', 'Fase Atual (de 10)', 'Nota Final (0 a 4)', 'Conceito',
         'Nota Instruções', 'Nota Algoritmo', 'Nota Decomposição', 'Nota Padrões', 'Nota Abstração',
         'Tempo (segundos)', 'Última Atualização'
     ])
@@ -464,7 +464,7 @@ def professor_exportar_csv():
             r['nome'], 
             r['turma'], 
             r['status'],
-            f"Fase {r['fase_atual']} de 20",
+            f"Fase {r['fase_atual']} de 10",
             str(round(r['nota_final'], 2)).replace('.', ','), 
             r['nivel_conceitual'],
             str(round(r['nota_instrucoes'], 2)).replace('.', ','), 
